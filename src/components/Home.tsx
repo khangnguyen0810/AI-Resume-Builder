@@ -1,0 +1,29 @@
+import React from "react";
+
+const Home = () => {
+  return (
+    <>
+      <div className="grid w-full grid-cols-2">
+        <div>
+          <div className="font-montserrat to-danger mt-40 bg-gradient-to-r from-[#FF8C00] via-[#FF4640] to-[#DC143C] bg-clip-text text-[64px] font-extrabold text-transparent italic">
+            Stop being a ghost to recruiters!
+          </div>
+          <div className="font-montserrat mt-5 text-[22px]">
+            Most resumes are rejected by bots before a human ever sees them. Our
+            AI analyzes your skills and the job description to build a 100%
+            ATS-optimized PDF that gets you the interview.
+          </div>
+          <button className="mt-10 cursor-pointer rounded bg-gradient-to-r from-[#FF8C00] via-[#FF4640] to-[#DC143C] px-8 py-4 text-white">
+            Upload & Optimize
+          </button>
+          <button className="ml-5 cursor-pointer rounded bg-gray-500 px-6 py-4 text-white">
+            Start from scratch
+          </button>
+        </div>
+        <img src="Resume.png" alt="" />
+      </div>
+    </>
+  );
+};
+
+export default Home;
