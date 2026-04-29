@@ -36,11 +36,11 @@ const Optimizer = () => {
                     <textarea
                         className="flex-1 rounded-lg border p-4 shadow-sm focus:border-red-500 focus:ring-1 focus:ring-red-500"
                         placeholder="Paste the job description here..."
-                        value={jd}
+                        // value={jd}
                         onChange={(e) => setJd(e.target.value)}
                     />
-                    <button className="font-montserrat rounded bg-[#003ae7] py-3 font-bold text-white shadow-lg transition-transform hover:scale-105">
-                        Optimize Now
+                    <button className="font-montserrat rounded bg-[#003ae7] py-3 font-medium text-white shadow-lg transition-transform hover:scale-105">
+                        Let the AI evaluate
                     </button>
                 </div>
             </div>
