@@ -1,3 +1,10 @@
 spring:
   application:
     name: ai-resume-builder
+  ai:
+    google:
+      genai:
+        api-key: AIzaSyAgEW417eBdtP70FhXO-x_T7l21UyQ2F0g
+        chat:
+          options:
+            model: gemini-3.1-flash-lite-preview
