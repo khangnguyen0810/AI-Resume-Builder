@@ -1,23 +1,28 @@
 package com.khangnguyen.ai_resume_builder.controller;
 
+import com.khangnguyen.ai_resume_builder.dto.OptimizationEvent;
+import com.khangnguyen.ai_resume_builder.service.OptimizationService;
 import com.khangnguyen.ai_resume_builder.dto.ParsedResumeDTO;
 import com.khangnguyen.ai_resume_builder.service.PdfService;
 import com.khangnguyen.ai_resume_builder.service.ResumeAgent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/api/resumes") // Proper RESTful naming convention (plural nouns)
-@RequiredArgsConstructor // Generates constructor for 'final' fields (Dependency Injection)
+@RequestMapping("/api/resumes")
+@RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "http://localhost:5173") // Allow your React frontend to call this API
+@CrossOrigin(origins = "http://localhost:5173")
 public class ResumeController {
 
     private final PdfService pdfService;
     private final ResumeAgent resumeAgent;
+    private final OptimizationService optimizationService;
 
     @PostMapping("/parse")
     public ResponseEntity<ParsedResumeDTO> parseResume(@RequestParam("file") MultipartFile file) {
@@ -27,13 +32,18 @@ public class ResumeController {
             return ResponseEntity.badRequest().build();
         }
 
-        // 1. Extract raw text from PDF
         String rawText = pdfService.extractText(file);
 
-        // 2. Classify and structure the text using the AI Agent
         ParsedResumeDTO parsedData = resumeAgent.classify(rawText);
 
-        // 3. Return the structured JSON to the client
         return ResponseEntity.ok(parsedData);
+    }
+    @GetMapping(value = "/optimize-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<OptimizationEvent> streamOptimization(
+            @RequestParam String jd,
+            @RequestBody ParsedResumeDTO resumeData) {
+
+        log.info("Starting adversarial optimization stream...");
+        return optimizationService.optimizeResume(jd, resumeData);
     }
 }

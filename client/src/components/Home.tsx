@@ -1,4 +1,4 @@
-import React, { useRef, ChangeEvent } from "react";
+import React, { useRef, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useResume } from "../context/ResumeContext";
 
