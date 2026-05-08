@@ -18,7 +18,7 @@ public class OptimizationService {
     public Flux<OptimizationEvent> optimizeResume(String jd, ParsedResumeDTO resumeData) {
         return Flux.create(sink -> {
             String currentDraft = "Initial draft pending...";
-            int maxIterations = 3;
+            int maxIterations = 1;
 
             for (int i = 1; i <= maxIterations; i++) {
                 currentDraft = callWriter(jd, resumeData, currentDraft);
@@ -28,7 +28,8 @@ public class OptimizationService {
                 sink.next(new OptimizationEvent("CRITIC", critique, i, false));
 
             }
-            sink.next(new OptimizationEvent("SYSTEM", currentDraft, maxIterations, true));
+            currentDraft = callWriter(jd, resumeData, currentDraft);
+            sink.next(new OptimizationEvent("WRITER", currentDraft, maxIterations, true));
             sink.complete();
         });
     }
