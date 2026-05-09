@@ -39,7 +39,7 @@ public class ResumeController {
 
         return ResponseEntity.ok(parsedData);
     }
-    @PostMapping("/optimize-stream")
+    @PostMapping("/optimize")
     public ResponseEntity<ParsedResumeDTO> resumeOptimization(
             @RequestBody OptimizeRequestDTO request) {
         log.info("Staring to optimize resume...");
