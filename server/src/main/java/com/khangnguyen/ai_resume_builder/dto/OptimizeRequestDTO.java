@@ -8,11 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor  
+@AllArgsConstructor
 
-public class OptimizationEvent {
-    private String agentName;
-    private String content;
-    private Integer iteration;
-    private Boolean isFinal;
+public class OptimizeRequestDTO {
+    private String jd;
+    private ParsedResumeDTO parsedResumeDTO;
 }

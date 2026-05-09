@@ -1,12 +1,13 @@
 package com.khangnguyen.ai_resume_builder.controller;
 
-import com.khangnguyen.ai_resume_builder.dto.OptimizationEvent;
+import com.khangnguyen.ai_resume_builder.dto.OptimizeRequestDTO;
 import com.khangnguyen.ai_resume_builder.service.OptimizationService;
 import com.khangnguyen.ai_resume_builder.dto.ParsedResumeDTO;
 import com.khangnguyen.ai_resume_builder.service.PdfService;
 import com.khangnguyen.ai_resume_builder.service.ResumeAgent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,12 +39,13 @@ public class ResumeController {
 
         return ResponseEntity.ok(parsedData);
     }
-    @GetMapping(value = "/optimize-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<OptimizationEvent> streamOptimization(
-            @RequestParam String jd,
-            @RequestBody ParsedResumeDTO resumeData) {
-
-        log.info("Starting adversarial optimization stream...");
-        return optimizationService.optimizeResume(jd, resumeData);
+    @PostMapping("/optimize-stream")
+    public ResponseEntity<ParsedResumeDTO> resumeOptimization(
+            @RequestBody OptimizeRequestDTO request) {
+        log.info("Staring to optimize resume...");
+        ParsedResumeDTO parsedData = optimizationService.optimizeResume(
+                request.getJd(), request.getParsedResumeDTO()
+        );
+        return ResponseEntity.ok(parsedData);
     }
 }
