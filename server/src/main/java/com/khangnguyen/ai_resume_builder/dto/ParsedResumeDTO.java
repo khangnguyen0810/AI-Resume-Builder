@@ -44,6 +44,6 @@ public class ParsedResumeDTO {
         private String school;
         private String degree;
         private String fieldOfStudy;
-        private String graduationDate;
+        private String duration;
     }
 }

@@ -32,7 +32,6 @@ public class ResumeAgent {
      */
     public ParsedResumeDTO classify(String rawText) {
         log.info("Requesting AI classification for resume text...");
-
         try {
             return chatClient.prompt()
                     .user(rawText)
