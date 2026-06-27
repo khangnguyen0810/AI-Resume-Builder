@@ -4,14 +4,18 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Optimizer = () => {
-    const { file, setParsedData } = useResume();
+    // Inject setJd from context
+    const { file, setParsedData, setJd } = useResume();
     const [fileUrl, setFileUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [jd, setJd] = useState("");
+    const [localJd, setLocalJd] = useState(""); // Rename local state to prevent naming conflict
     const navigate = useNavigate();
 
     const handleEvaluate = async () => {
-        if (!file) return;
+        if (!file || !localJd.trim()) {
+            alert("Please paste a job description first.");
+            return;
+        }
         setLoading(true);
 
         try {
@@ -23,6 +27,7 @@ const Optimizer = () => {
             );
 
             setParsedData(response.data);
+            setJd(localJd); // FIX: Save the JD globally so the next page can read it
             navigate("/evaluate");
         } catch (e) {
             console.error("Parsing failed", e);
@@ -62,8 +67,8 @@ const Optimizer = () => {
                     <textarea
                         className="flex-1 rounded-lg border p-4 shadow-sm focus:border-red-500 focus:ring-1 focus:ring-red-500"
                         placeholder="Paste the job description here..."
-                        value={jd}
-                        onChange={(e) => setJd(e.target.value)}
+                        value={localJd}
+                        onChange={(e) => setLocalJd(e.target.value)}
                     />
                     <button
                         onClick={handleEvaluate}

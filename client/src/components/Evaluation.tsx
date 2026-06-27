@@ -1,13 +1,41 @@
-import React from "react";
+import React, { useState, useEffect, useEffectEvent } from "react";
 import { useResume } from "../context/ResumeContext";
+import axios from "axios";
 
 const Evaluation = () => {
-    const { parsedData } = useResume();
+    const { parsedData, jd, optimizedData, setOptimizedData } = useResume();
+    const [loadingOptimize, setLoadingOptimize] = useState(false);
+
+    useEffect(() => {
+        // Only run optimization if we have parsed data, a JD, and haven't optimized yet
+        if (parsedData && jd && !optimizedData && !loadingOptimize) {
+            const fetchOptimization = async () => {
+                setLoadingOptimize(true);
+                try {
+                    // Match the OptimizeRequestDTO contract from your backend
+                    const response = await axios.post(
+                        "http://localhost:8080/api/resumes/optimize",
+                        {
+                            jd: jd,
+                            parsedResumeDTO: parsedData,
+                        },
+                    );
+                    setOptimizedData(response.data);
+                } catch (err) {
+                    console.error("Optimization failed", err);
+                } finally {
+                    setLoadingOptimize(false);
+                }
+            };
+            fetchOptimization();
+        }
+    }, [parsedData, jd, optimizedData]);
 
     if (!parsedData) return <div>No data found. Please upload a CV first.</div>;
 
     return (
         <div className="flex h-[calc(100vh-100px)] gap-8 p-6">
+            {/* COLUMN 1: User-uploaded Resume */}
             <div className="custom-scrollbar flex-1 overflow-y-auto rounded-xl border bg-white p-10 shadow-2xl">
                 <header className="mb-6 border-b pb-6">
                     <h1 className="text-4xl font-bold text-gray-800">
@@ -90,12 +118,117 @@ const Evaluation = () => {
                 </section>
             </div>
 
-            {/* Column 2: AI Suggestions (Placeholder for next step) */}
-            <div className="w-1/3 overflow-y-auto rounded-xl border bg-gray-900 p-8 text-white shadow-xl">
-                <h2 className="mb-4 text-2xl font-bold">AI Optimizer Agent</h2>
-                <p className="text-gray-400 italic">
-                    Waiting for your JD evaluation...
-                </p>
+            {/* COLUMN 2: AI-Optimized Resume */}
+            <div className="custom-scrollbar flex-1 overflow-y-auto rounded-xl border border-blue-200 bg-blue-50/30 p-10 shadow-2xl">
+                <div className="mb-4 inline-block rounded bg-blue-600 px-3 py-1 text-xs font-semibold tracking-wider text-white uppercase">
+                    ATS Optimized Version
+                </div>
+
+                {loadingOptimize ? (
+                    <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
+                        <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+                        <p className="animate-pulse text-lg font-medium text-blue-800">
+                            AI is tailoring your resume to the Job
+                            Description...
+                        </p>
+                    </div>
+                ) : optimizedData ? (
+                    <>
+                        {/* Header Info */}
+                        <header className="mb-6 border-b border-blue-200 pb-6">
+                            <h1 className="text-4xl font-bold text-slate-900">
+                                {optimizedData.personalInfo.fullName}
+                            </h1>
+                            <div className="mt-2 flex flex-wrap gap-4 text-sm text-slate-600">
+                                <span>{optimizedData.personalInfo.email}</span>
+                                <span>{optimizedData.personalInfo.phone}</span>
+                                <span>
+                                    {optimizedData.personalInfo.location}
+                                </span>
+                            </div>
+                        </header>
+
+                        {/* Summary Section */}
+                        <section className="mb-8">
+                            <h2 className="mb-2 text-lg font-semibold tracking-wider text-blue-700 uppercase">
+                                Summary
+                            </h2>
+                            <p className="rounded border border-yellow-100 bg-yellow-50 p-2 leading-relaxed font-medium text-slate-800">
+                                {optimizedData.summary}
+                            </p>
+                        </section>
+
+                        {/* Education Section (Newly Fixed & Aligned) */}
+                        <section className="mb-8">
+                            <h2 className="mb-4 text-lg font-semibold tracking-wider text-blue-700 uppercase">
+                                Education
+                            </h2>
+                            {optimizedData.education.map((edu, i) => (
+                                <div key={i} className="mb-6">
+                                    <div className="flex items-baseline justify-between">
+                                        <h3 className="font-bold text-slate-900">
+                                            {edu.school}
+                                        </h3>
+                                        <span className="text-sm text-slate-500 italic">
+                                            {edu.duration}
+                                        </span>
+                                    </div>
+                                    <p className="font-medium text-slate-700">
+                                        {edu.degree}
+                                    </p>
+                                    <p className="text-slate-600">
+                                        {edu.fieldOfStudy}
+                                    </p>
+                                </div>
+                            ))}
+                        </section>
+
+                        {/* Experience Section */}
+                        <section className="mb-8">
+                            <h2 className="mb-4 text-lg font-semibold tracking-wider text-blue-700 uppercase">
+                                Experience
+                            </h2>
+                            {optimizedData.experience.map((exp, i) => (
+                                <div key={i} className="mb-6">
+                                    <div className="flex items-baseline justify-between">
+                                        <h3 className="font-bold text-slate-900">
+                                            {exp.jobTitle}
+                                        </h3>
+                                        <span className="text-sm text-slate-500 italic">
+                                            {exp.duration}
+                                        </span>
+                                    </div>
+                                    <p className="font-medium text-slate-700">
+                                        {exp.company}
+                                    </p>
+                                    <ul className="mt-2 list-inside list-disc space-y-1 text-slate-800">
+                                        {exp.responsibilities.map((resp, j) => (
+                                            <li key={j} className="text-sm">
+                                                {resp}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </section>
+
+                        {/* Skills Section (Newly Fixed & Aligned) */}
+                        <section>
+                            <h2 className="mb-4 text-lg font-semibold tracking-wider text-blue-700 uppercase">
+                                Skills
+                            </h2>
+                            <div className="grid list-inside grid-cols-2 text-slate-800">
+                                {optimizedData.skills.map((skill, i) => (
+                                    <li key={i}>{skill}</li>
+                                ))}
+                            </div>
+                        </section>
+                    </>
+                ) : (
+                    <div className="mt-20 text-center text-gray-500">
+                        Failed to generate optimization strategy.
+                    </div>
+                )}
             </div>
         </div>
     );

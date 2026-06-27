@@ -18,11 +18,10 @@ public class ResumeAgent {
     public ResumeAgent(ChatClient.Builder builder) {
         this.chatClient = builder
                 .defaultSystem("""
-                    You are an expert ATS (Applicant Tracking System) parser. 
+                    You are an expert ATS (Applicant Tracking System) parser.
                     Your task is to extract information from the provided resume text.
                     Return the data in a valid JSON format that matches the requested schema.
                     If a field is missing, return null or an empty list.
-                    Do not include any markdown formatting like ```json in your response.
                     """)
                 .build();
     }
