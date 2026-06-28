@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useEffectEvent } from "react";
 import { useResume } from "../context/ResumeContext";
 import axios from "axios";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ClassicTemplate } from "./templates/ClassicTemplate";
 
 const Evaluation = () => {
     const { parsedData, jd, optimizedData, setOptimizedData } = useResume();
@@ -213,7 +215,8 @@ const Evaluation = () => {
                         </section>
 
                         {/* Skills Section (Newly Fixed & Aligned) */}
-                        <section>
+                        {/* Skills Section */}
+                        <section className="mb-8">
                             <h2 className="mb-4 text-lg font-semibold tracking-wider text-blue-700 uppercase">
                                 Skills
                             </h2>
@@ -221,6 +224,56 @@ const Evaluation = () => {
                                 {optimizedData.skills.map((skill, i) => (
                                     <li key={i}>{skill}</li>
                                 ))}
+                            </div>
+                        </section>
+
+                        {/* EXPORT PANEL SECTION */}
+                        <section className="mt-10 border-t border-blue-200 pt-6">
+                            <h3 className="mb-3 text-sm font-bold tracking-wider text-blue-800 uppercase">
+                                Select Export Format
+                            </h3>
+
+                            <div className="flex flex-col gap-4">
+                                {/* Template Selection Card (1 option layout) */}
+                                <div className="flex items-center justify-between rounded-lg border border-blue-300 bg-white p-4 shadow-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 ring-4 ring-blue-100">
+                                            <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-900">
+                                                Classic Executive Template
+                                            </p>
+                                            <p className="text-xs text-slate-500">
+                                                Traditional layout preferred by
+                                                ATS parsers
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
+                                        Default
+                                    </span>
+                                </div>
+
+                                {/* Dynamic Download Trigger */}
+                                <PDFDownloadLink
+                                    document={
+                                        <ClassicTemplate data={optimizedData} />
+                                    }
+                                    fileName={`${optimizedData.personalInfo.fullName.replace(/\s+/g, "_")}_Optimized_Resume.pdf`}
+                                    className="w-full text-center"
+                                >
+                                    {({ loading }) => (
+                                        <button
+                                            disabled={loading}
+                                            className="font-montserrat w-full cursor-pointer rounded bg-[#003ae7] py-3 font-medium text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:bg-gray-400"
+                                        >
+                                            {loading
+                                                ? "Assembling PDF Layers..."
+                                                : "Download Optimized PDF"}
+                                        </button>
+                                    )}
+                                </PDFDownloadLink>
                             </div>
                         </section>
                     </>

@@ -27,7 +27,7 @@ public class PdfService {
                 // 400 Bad Request: The user provided a "bad" file (likely just an image/scan)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "PDF is empty or contains only images (OCR not supported yet).");
-            }
+            }   
 
             return text;
         } catch (IOException e) {
