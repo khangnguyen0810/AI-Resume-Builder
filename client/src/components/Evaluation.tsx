@@ -7,6 +7,7 @@ import { ClassicTemplate } from "./templates/ClassicTemplate";
 const Evaluation = () => {
     const { parsedData, jd, optimizedData, setOptimizedData } = useResume();
     const [loadingOptimize, setLoadingOptimize] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
 
     useEffect(() => {
         // Only run optimization if we have parsed data, a JD, and haven't optimized yet
@@ -234,8 +235,12 @@ const Evaluation = () => {
                             </h3>
 
                             <div className="flex flex-col gap-4">
-                                {/* Template Selection Card (1 option layout) */}
-                                <div className="flex items-center justify-between rounded-lg border border-blue-300 bg-white p-4 shadow-sm">
+                                {/* Template Selection Card Wrapper Container */}
+                                <div
+                                    onMouseEnter={() => setShowPreview(true)}
+                                    onMouseLeave={() => setShowPreview(false)}
+                                    className="relative flex cursor-help items-center justify-between rounded-lg border border-blue-300 bg-white p-4 shadow-sm transition-all duration-200 hover:border-blue-500 hover:shadow-md"
+                                >
                                     <div className="flex items-center gap-3">
                                         <div className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 ring-4 ring-blue-100">
                                             <div className="h-1.5 w-1.5 rounded-full bg-white" />
@@ -245,17 +250,82 @@ const Evaluation = () => {
                                                 Classic Executive Template
                                             </p>
                                             <p className="text-xs text-slate-500">
-                                                Traditional layout preferred by
-                                                ATS parsers
+                                                Traditional single-column layout
+                                                preferred by corporate
+                                                recruiters
                                             </p>
                                         </div>
                                     </div>
                                     <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
                                         Default
                                     </span>
+
+                                    {/* DYNAMIC HOVER TOOLTIP PREVIEW LAYER */}
+                                    {showPreview && (
+                                        <div className="absolute right-0 bottom-full z-50 mb-3 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl transition-all duration-300">
+                                            <div className="mb-2 flex items-center justify-between border-b pb-1.5">
+                                                <span className="text-[10px] font-bold tracking-wide text-slate-500 uppercase">
+                                                    Layout Blueprint Preview
+                                                </span>
+                                                <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600">
+                                                    A4 Page Map
+                                                </span>
+                                            </div>
+
+                                            {/* Highly Performant Structural Mockup Map */}
+                                            <div className="flex aspect-[1/1.414] w-full flex-col gap-2 overflow-hidden rounded border border-slate-300 bg-white p-3 shadow-inner select-none">
+                                                {/* Mock PII Header Area */}
+                                                <div className="h-2 w-3/4 rounded-sm bg-blue-900"></div>
+                                                <div className="flex gap-1.5">
+                                                    <div className="h-1 w-1/5 rounded-sm bg-slate-300"></div>
+                                                    <div className="h-1 w-1/5 rounded-sm bg-slate-300"></div>
+                                                    <div className="h-1 w-1/5 rounded-sm bg-slate-300"></div>
+                                                </div>
+                                                <div className="my-0.5 h-[0.5px] bg-slate-200" />
+
+                                                {/* Mock Summary block */}
+                                                <div className="h-1.5 w-1/4 rounded-sm bg-blue-700"></div>
+                                                <div className="space-y-1">
+                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
+                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
+                                                    <div className="h-1 w-5/6 rounded-sm bg-slate-100"></div>
+                                                </div>
+
+                                                {/* Mock Experience block */}
+                                                <div className="mt-1 h-1.5 w-1/3 rounded-sm bg-blue-700"></div>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="h-1.5 w-1/2 rounded-sm bg-slate-400"></div>
+                                                    <div className="h-1 w-1/6 rounded-sm bg-slate-300"></div>
+                                                </div>
+                                                <div className="space-y-1 pl-1">
+                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
+                                                    <div className="h-1 w-11/12 rounded-sm bg-slate-100"></div>
+                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
+                                                </div>
+
+                                                {/* Mock Education block */}
+                                                <div className="mt-1 h-1.5 w-1/4 rounded-sm bg-blue-700"></div>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="h-1.5 w-2/5 rounded-sm bg-slate-400"></div>
+                                                    <div className="h-1 w-1/6 rounded-sm bg-slate-300"></div>
+                                                </div>
+                                                <div className="h-1 w-1/3 rounded-sm bg-slate-200"></div>
+
+                                                {/* Mock Skills grid block */}
+                                                <div className="mt-1 h-1.5 w-1/4 rounded-sm bg-blue-700"></div>
+                                                <div className="grid grid-cols-3 gap-1">
+                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
+                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
+                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
+                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
+                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
-                                {/* Dynamic Download Trigger */}
+                                {/* Dynamic Download Link Block */}
                                 <PDFDownloadLink
                                     document={
                                         <ClassicTemplate data={optimizedData} />
