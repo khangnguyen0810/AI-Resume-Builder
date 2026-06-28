@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useEffectEvent } from "react";
+import { useState, useEffect } from "react";
 import { useResume } from "../context/ResumeContext";
 import { useNavigate } from "react-router-dom";
 import API from "../lib/axios";

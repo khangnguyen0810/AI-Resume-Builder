@@ -1,4 +1,4 @@
-import React, { useRef, useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useResume } from "../context/ResumeContext";
 import { AILoader } from "./AILoader"; // Make sure the path matches your folder structure

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useEffectEvent } from "react";
+import { useState, useEffect } from "react";
 import { useResume } from "../context/ResumeContext";
 import API from "../lib/axios";
 import { PDFDownloadLink } from "@react-pdf/renderer";

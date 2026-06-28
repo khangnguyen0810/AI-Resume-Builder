@@ -1,10 +1,5 @@
 // client/src/context/ResumeContext.tsx
-import React, {
-    createContext,
-    useContext,
-    useState,
-    type ReactNode,
-} from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { type ParsedResume } from "../types/resume";
 
 interface ResumeContextType {
