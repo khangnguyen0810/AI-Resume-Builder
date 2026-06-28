@@ -18,7 +18,7 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/api/resumes")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "${app.cors.allowed-origins:*}")
 public class ResumeController {
 
     private final PdfService pdfService;

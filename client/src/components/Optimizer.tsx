@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useEffectEvent } from "react";
 import { useResume } from "../context/ResumeContext";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../lib/axios";
 import { AILoader } from "./AILoader";
 
 const Optimizer = () => {
@@ -9,7 +9,9 @@ const Optimizer = () => {
     const { file, setParsedData, setJd } = useResume();
     const [fileUrl, setFileUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [localJd, setLocalJd] = useState(""); // Rename local state to prevent naming conflict
+    const [localJd, setLocalJd] = useState(
+        "We are looking for a Senior Java Developer with 5+ years of experience in Spring Boot, microservices architecture, and cloud platforms (AWS/GCP). The ideal candidate has strong knowledge of REST API design, CI/CD pipelines, and agile methodologies.",
+    ); // Rename local state to prevent naming conflict
     const navigate = useNavigate();
 
     const handleEvaluate = async () => {
@@ -22,10 +24,7 @@ const Optimizer = () => {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            const response = await axios.post(
-                "http://localhost:8080/api/resumes/parse",
-                formData,
-            );
+            const response = await API.post("/api/resumes/parse", formData);
 
             setParsedData(response.data);
             setJd(localJd); // FIX: Save the JD globally so the next page can read it

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useEffectEvent } from "react";
 import { useResume } from "../context/ResumeContext";
-import axios from "axios";
+import API from "../lib/axios";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { AILoader } from "./AILoader";
@@ -17,13 +17,10 @@ const Evaluation = () => {
                 setLoadingOptimize(true);
                 try {
                     // Match the OptimizeRequestDTO contract from your backend
-                    const response = await axios.post(
-                        "http://localhost:8080/api/resumes/optimize",
-                        {
-                            jd: jd,
-                            parsedResumeDTO: parsedData,
-                        },
-                    );
+                    const response = await API.post("/api/resumes/optimize", {
+                        jd: jd,
+                        parsedResumeDTO: parsedData,
+                    });
                     setOptimizedData(response.data);
                 } catch (err) {
                     console.error("Optimization failed", err);
