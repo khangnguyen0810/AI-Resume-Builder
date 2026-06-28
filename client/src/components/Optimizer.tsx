@@ -9,9 +9,7 @@ const Optimizer = () => {
     const { file, setParsedData, setJd } = useResume();
     const [fileUrl, setFileUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [localJd, setLocalJd] = useState(
-        "We are looking for a Senior Java Developer with 5+ years of experience in Spring Boot, microservices architecture, and cloud platforms (AWS/GCP). The ideal candidate has strong knowledge of REST API design, CI/CD pipelines, and agile methodologies.",
-    ); // Rename local state to prevent naming conflict
+    const [localJd, setLocalJd] = useState(""); // Rename local state to prevent naming conflict
     const navigate = useNavigate();
 
     const handleEvaluate = async () => {
