@@ -2,6 +2,7 @@ import React, { useState, useEffect, useEffectEvent } from "react";
 import { useResume } from "../context/ResumeContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { AILoader } from "./AILoader";
 
 const Optimizer = () => {
     // Inject setJd from context
@@ -44,6 +45,10 @@ const Optimizer = () => {
             return () => URL.revokeObjectURL(url);
         }
     }, [file]);
+    if (loading)
+        return (
+            <AILoader message="AI is reading and parsing your CV layers..." />
+        );
     return (
         <>
             <div className="mt-[50px] flex h-[calc(100vh-100px)] gap-6 p-4">
