@@ -13,9 +13,9 @@ The platform leverages a specialized two-stage AI agent pipeline combined with a
 ```
 [ User Resume Upload ] ──> [ OCR Parsing Subsystem ] ──> Raw Text Extracted
                                                                │
-[ Job Description ] ───────────────────────────────────────────┼──────────┐
-                                                               │          │
-                                                               ▼          ▼
+[ Job Description ] ───────────────────────────────────────────┼
+                                                               │
+                                                               ▼
                                                        ┌────────────────────────┐
                                                        │  AI Agent 1 (Parser)   │
                                                        └────────────────────────┘
