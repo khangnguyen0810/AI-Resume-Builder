@@ -3,7 +3,6 @@ import { useResume } from "../context/ResumeContext";
 import API from "../lib/axios";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
-import { AILoader } from "./AILoader";
 
 const Evaluation = () => {
     const { parsedData, jd, optimizedData, setOptimizedData } = useResume();
@@ -11,12 +10,10 @@ const Evaluation = () => {
     const [showPreview, setShowPreview] = useState(false);
 
     useEffect(() => {
-        // Only run optimization if we have parsed data, a JD, and haven't optimized yet
         if (parsedData && jd && !optimizedData && !loadingOptimize) {
             const fetchOptimization = async () => {
                 setLoadingOptimize(true);
                 try {
-                    // Match the OptimizeRequestDTO contract from your backend
                     const response = await API.post("/api/resumes/optimize", {
                         jd: jd,
                         parsedResumeDTO: parsedData,
@@ -32,329 +29,380 @@ const Evaluation = () => {
         }
     }, [parsedData, jd, optimizedData]);
 
-    if (!parsedData) return <div>No data found. Please upload a CV first.</div>;
+    if (!parsedData) {
+        return (
+            <div className="flex h-[60vh] flex-col items-center justify-center gap-4 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900 text-slate-500">
+                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <p className="text-slate-400">No data found. Please upload a CV first.</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="flex h-[calc(100vh-100px)] gap-8 p-6">
-            {/* COLUMN 1: User-uploaded Resume */}
-            <div className="custom-scrollbar flex-1 overflow-y-auto rounded-xl border bg-white p-10 shadow-2xl">
-                <header className="mb-6 border-b pb-6">
-                    <h1 className="text-4xl font-bold text-gray-800">
-                        {parsedData.personalInfo.fullName}
+        <div className="animate-fade-in flex flex-col gap-6">
+            {/* Top Bar Header */}
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+                <div>
+                    <h1 className="font-heading text-2xl font-bold text-white">
+                        Resume Analysis & Optimization Comparison
                     </h1>
-                    <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600">
-                        <span>{parsedData.personalInfo.email}</span>
-                        <span>{parsedData.personalInfo.phone}</span>
-                        <span>{parsedData.personalInfo.location}</span>
-                    </div>
-                </header>
-
-                <section className="mb-8">
-                    <h2 className="mb-2 text-lg font-semibold tracking-wider text-red-600 uppercase">
-                        Summary
-                    </h2>
-                    <p className="leading-relaxed text-gray-700">
-                        {parsedData.summary}
+                    <p className="text-xs text-slate-400">
+                        Side-by-side evaluation of your uploaded CV vs. AI ATS-optimized version
                     </p>
-                </section>
-
-                <section className="mb-8">
-                    <h2 className="mb-4 text-lg font-semibold tracking-wider text-red-600 uppercase">
-                        Education
-                    </h2>
-                    {parsedData.education.map((edu, i) => (
-                        <div key={i} className="mb-6">
-                            <div className="flex items-baseline justify-between">
-                                <h3 className="font-bold text-gray-800">
-                                    {edu.school}
-                                </h3>
-                                <span className="text-sm text-gray-500 italic">
-                                    {edu.duration}
-                                </span>
-                            </div>
-                            <p className="font-medium text-gray-600">
-                                {edu.degree}
-                            </p>
-                            <p className="text-gray-600">{edu.fieldOfStudy}</p>
-                        </div>
-                    ))}
-                </section>
-                <section>
-                    <h2 className="mb-4 text-lg font-semibold tracking-wider text-red-600 uppercase">
-                        Experience
-                    </h2>
-                    {parsedData.experience.map((exp, i) => (
-                        <div key={i} className="mb-6">
-                            <div className="flex items-baseline justify-between">
-                                <h3 className="font-bold text-gray-800">
-                                    {exp.jobTitle}
-                                </h3>
-                                <span className="text-sm text-gray-500 italic">
-                                    {exp.duration}
-                                </span>
-                            </div>
-                            <p className="font-medium text-gray-600">
-                                {exp.company}
-                            </p>
-                            <ul className="mt-2 list-inside list-disc space-y-1 text-gray-700">
-                                {exp.responsibilities.map((resp, j) => (
-                                    <li key={j} className="text-sm">
-                                        {resp}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
-                </section>
-
-                <section>
-                    <h2 className="mb-4 text-lg font-semibold tracking-wider text-red-600 uppercase">
-                        Skills
-                    </h2>
-                    <div className="grid list-inside grid-cols-2">
-                        {parsedData.skills.map((skill, i) => (
-                            <li key={i}>{skill}</li>
-                        ))}
-                    </div>
-                </section>
+                </div>
+                <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900 px-3 py-1 font-mono text-xs text-slate-400">
+                        <span className="h-2 w-2 rounded-full bg-slate-500"></span>
+                        Original
+                    </span>
+                    <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-xs text-emerald-400">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                        ATS Enhanced
+                    </span>
+                </div>
             </div>
 
-            {/* COLUMN 2: AI-Optimized Resume */}
-            <div className="custom-scrollbar flex-1 overflow-y-auto rounded-xl border border-blue-200 bg-blue-50/30 p-10 shadow-2xl">
-                <div className="mb-4 inline-block rounded bg-blue-600 px-3 py-1 text-xs font-semibold tracking-wider text-white uppercase">
-                    ATS Optimized Version
+            {/* Split Comparison Columns */}
+            <div className="flex flex-col gap-6 lg:flex-row lg:h-[calc(100vh-210px)]">
+                {/* COLUMN 1: Original Uploaded Resume */}
+                <div className="custom-scrollbar flex-1 overflow-y-auto rounded-2xl border border-slate-800/80 bg-[#0d121d] p-6 lg:p-8 shadow-xl">
+                    <div className="mb-6 flex items-center justify-between border-b border-slate-800/80 pb-4">
+                        <span className="rounded border border-slate-700/60 bg-slate-800/50 px-2.5 py-1 font-mono text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                            Original Parsing
+                        </span>
+                        <span className="font-mono text-xs text-slate-500">RAW DATA</span>
+                    </div>
+
+                    <header className="mb-6">
+                        <h2 className="font-heading text-2xl font-bold text-white">
+                            {parsedData.personalInfo.fullName}
+                        </h2>
+                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-slate-400">
+                            <span>{parsedData.personalInfo.email}</span>
+                            <span>•</span>
+                            <span>{parsedData.personalInfo.phone}</span>
+                            <span>•</span>
+                            <span>{parsedData.personalInfo.location}</span>
+                        </div>
+                    </header>
+
+                    {/* Summary */}
+                    <section className="mb-6 border-t border-slate-800/60 pt-4">
+                        <h3 className="mb-2 font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                            Summary
+                        </h3>
+                        <p className="text-sm leading-relaxed text-slate-300">
+                            {parsedData.summary}
+                        </p>
+                    </section>
+
+                    {/* Experience */}
+                    <section className="mb-6 border-t border-slate-800/60 pt-4">
+                        <h3 className="mb-4 font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                            Experience
+                        </h3>
+                        {parsedData.experience.map((exp, i) => (
+                            <div key={i} className="mb-5 last:mb-0">
+                                <div className="flex items-baseline justify-between">
+                                    <h4 className="font-semibold text-white text-sm">
+                                        {exp.jobTitle}
+                                    </h4>
+                                    <span className="font-mono text-xs text-slate-500">
+                                        {exp.duration}
+                                    </span>
+                                </div>
+                                <p className="text-xs font-medium text-slate-400">
+                                    {exp.company}
+                                </p>
+                                <ul className="mt-2 space-y-1 text-xs text-slate-300 list-disc list-inside">
+                                    {exp.responsibilities.map((resp, j) => (
+                                        <li key={j} className="leading-relaxed">
+                                            {resp}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </section>
+
+                    {/* Education */}
+                    <section className="mb-6 border-t border-slate-800/60 pt-4">
+                        <h3 className="mb-4 font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                            Education
+                        </h3>
+                        {parsedData.education.map((edu, i) => (
+                            <div key={i} className="mb-4 last:mb-0">
+                                <div className="flex items-baseline justify-between">
+                                    <h4 className="font-semibold text-white text-sm">
+                                        {edu.school}
+                                    </h4>
+                                    <span className="font-mono text-xs text-slate-500">
+                                        {edu.duration}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-slate-300">
+                                    {edu.degree} in {edu.fieldOfStudy}
+                                </p>
+                            </div>
+                        ))}
+                    </section>
+
+                    {/* Skills */}
+                    <section className="border-t border-slate-800/60 pt-4">
+                        <h3 className="mb-3 font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                            Parsed Skills
+                        </h3>
+                        <div className="flex flex-wrap gap-1.5">
+                            {parsedData.skills.map((skill, i) => (
+                                <span
+                                    key={i}
+                                    className="rounded border border-slate-800 bg-slate-900 px-2.5 py-1 font-mono text-xs text-slate-400"
+                                >
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </section>
                 </div>
 
-                {loadingOptimize && (
-                    <AILoader message="Rewriting experience bullets to pass ATS gatekeepers..." />
-                ) ? (
-                    <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
-                        <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-                        <p className="animate-pulse text-lg font-medium text-blue-800">
-                            AI is tailoring your resume to the Job
-                            Description...
-                        </p>
+                {/* COLUMN 2: AI-Optimized Resume */}
+                <div className="custom-scrollbar flex-1 overflow-y-auto rounded-2xl border border-emerald-500/40 bg-[#0d121d] p-6 lg:p-8 shadow-[0_0_30px_rgba(16,185,129,0.06)]">
+                    <div className="mb-6 flex items-center justify-between border-b border-emerald-500/20 pb-4">
+                        <span className="rounded border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 font-mono text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                            ATS Optimized Version
+                        </span>
+                        <span className="flex items-center gap-1.5 font-mono text-xs text-emerald-400">
+                            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            AI TAILORED
+                        </span>
                     </div>
-                ) : optimizedData ? (
-                    <>
-                        {/* Header Info */}
-                        <header className="mb-6 border-b border-blue-200 pb-6">
-                            <h1 className="text-4xl font-bold text-slate-900">
-                                {optimizedData.personalInfo.fullName}
-                            </h1>
-                            <div className="mt-2 flex flex-wrap gap-4 text-sm text-slate-600">
-                                <span>{optimizedData.personalInfo.email}</span>
-                                <span>{optimizedData.personalInfo.phone}</span>
-                                <span>
-                                    {optimizedData.personalInfo.location}
-                                </span>
-                            </div>
-                        </header>
 
-                        {/* Summary Section */}
-                        <section className="mb-8">
-                            <h2 className="mb-2 text-lg font-semibold tracking-wider text-blue-700 uppercase">
-                                Summary
-                            </h2>
-                            <p className="rounded border border-yellow-100 bg-yellow-50 p-2 leading-relaxed font-medium text-slate-800">
-                                {optimizedData.summary}
+                    {loadingOptimize ? (
+                        <div className="flex h-[50vh] flex-col items-center justify-center gap-4">
+                            <div className="h-10 w-10 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent"></div>
+                            <p className="animate-pulse text-sm font-medium text-emerald-300 font-mono">
+                                Rewriting bullets for max ATS match score...
                             </p>
-                        </section>
-
-                        {/* Education Section (Newly Fixed & Aligned) */}
-                        <section className="mb-8">
-                            <h2 className="mb-4 text-lg font-semibold tracking-wider text-blue-700 uppercase">
-                                Education
-                            </h2>
-                            {optimizedData.education.map((edu, i) => (
-                                <div key={i} className="mb-6">
-                                    <div className="flex items-baseline justify-between">
-                                        <h3 className="font-bold text-slate-900">
-                                            {edu.school}
-                                        </h3>
-                                        <span className="text-sm text-slate-500 italic">
-                                            {edu.duration}
-                                        </span>
-                                    </div>
-                                    <p className="font-medium text-slate-700">
-                                        {edu.degree}
-                                    </p>
-                                    <p className="text-slate-600">
-                                        {edu.fieldOfStudy}
-                                    </p>
+                        </div>
+                    ) : optimizedData ? (
+                        <>
+                            {/* Header Info */}
+                            <header className="mb-6">
+                                <h2 className="font-heading text-2xl font-bold text-white">
+                                    {optimizedData.personalInfo.fullName}
+                                </h2>
+                                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-emerald-400/80">
+                                    <span>{optimizedData.personalInfo.email}</span>
+                                    <span>•</span>
+                                    <span>{optimizedData.personalInfo.phone}</span>
+                                    <span>•</span>
+                                    <span>{optimizedData.personalInfo.location}</span>
                                 </div>
-                            ))}
-                        </section>
+                            </header>
 
-                        {/* Experience Section */}
-                        <section className="mb-8">
-                            <h2 className="mb-4 text-lg font-semibold tracking-wider text-blue-700 uppercase">
-                                Experience
-                            </h2>
-                            {optimizedData.experience.map((exp, i) => (
-                                <div key={i} className="mb-6">
-                                    <div className="flex items-baseline justify-between">
-                                        <h3 className="font-bold text-slate-900">
-                                            {exp.jobTitle}
-                                        </h3>
-                                        <span className="text-sm text-slate-500 italic">
-                                            {exp.duration}
-                                        </span>
-                                    </div>
-                                    <p className="font-medium text-slate-700">
-                                        {exp.company}
-                                    </p>
-                                    <ul className="mt-2 list-inside list-disc space-y-1 text-slate-800">
-                                        {exp.responsibilities.map((resp, j) => (
-                                            <li key={j} className="text-sm">
-                                                {resp}
-                                            </li>
-                                        ))}
-                                    </ul>
+                            {/* Summary Section */}
+                            <section className="mb-6 border-t border-emerald-500/20 pt-4">
+                                <h3 className="mb-2 font-mono text-xs font-bold tracking-wider text-emerald-400 uppercase">
+                                    Executive Summary (Keywords Added)
+                                </h3>
+                                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm leading-relaxed text-slate-200">
+                                    {optimizedData.summary}
                                 </div>
-                            ))}
-                        </section>
+                            </section>
 
-                        {/* Skills Section (Newly Fixed & Aligned) */}
-                        {/* Skills Section */}
-                        <section className="mb-8">
-                            <h2 className="mb-4 text-lg font-semibold tracking-wider text-blue-700 uppercase">
-                                Skills
-                            </h2>
-                            <div className="grid list-inside grid-cols-2 text-slate-800">
-                                {optimizedData.skills.map((skill, i) => (
-                                    <li key={i}>{skill}</li>
+                            {/* Experience Section */}
+                            <section className="mb-6 border-t border-emerald-500/20 pt-4">
+                                <h3 className="mb-4 font-mono text-xs font-bold tracking-wider text-emerald-400 uppercase">
+                                    Impact-Optimized Experience
+                                </h3>
+                                {optimizedData.experience.map((exp, i) => (
+                                    <div key={i} className="mb-5 last:mb-0">
+                                        <div className="flex items-baseline justify-between">
+                                            <h4 className="font-semibold text-white text-sm">
+                                                {exp.jobTitle}
+                                            </h4>
+                                            <span className="font-mono text-xs text-slate-500">
+                                                {exp.duration}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs font-medium text-emerald-400/90">
+                                            {exp.company}
+                                        </p>
+                                        <ul className="mt-2 space-y-1.5 text-xs text-slate-200 list-disc list-inside">
+                                            {exp.responsibilities.map((resp, j) => (
+                                                <li key={j} className="leading-relaxed">
+                                                    {resp}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 ))}
-                            </div>
-                        </section>
+                            </section>
 
-                        {/* EXPORT PANEL SECTION */}
-                        <section className="mt-10 border-t border-blue-200 pt-6">
-                            <h3 className="mb-3 text-sm font-bold tracking-wider text-blue-800 uppercase">
-                                Select Export Format
-                            </h3>
-
-                            <div className="flex flex-col gap-4">
-                                {/* Template Selection Card Wrapper Container */}
-                                <div
-                                    onMouseEnter={() => setShowPreview(true)}
-                                    onMouseLeave={() => setShowPreview(false)}
-                                    className="relative flex cursor-help items-center justify-between rounded-lg border border-blue-300 bg-white p-4 shadow-sm transition-all duration-200 hover:border-blue-500 hover:shadow-md"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 ring-4 ring-blue-100">
-                                            <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                            {/* Education Section */}
+                            <section className="mb-6 border-t border-emerald-500/20 pt-4">
+                                <h3 className="mb-4 font-mono text-xs font-bold tracking-wider text-emerald-400 uppercase">
+                                    Education
+                                </h3>
+                                {optimizedData.education.map((edu, i) => (
+                                    <div key={i} className="mb-4 last:mb-0">
+                                        <div className="flex items-baseline justify-between">
+                                            <h4 className="font-semibold text-white text-sm">
+                                                {edu.school}
+                                            </h4>
+                                            <span className="font-mono text-xs text-slate-500">
+                                                {edu.duration}
+                                            </span>
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-slate-900">
-                                                Classic Executive Template
-                                            </p>
-                                            <p className="text-xs text-slate-500">
-                                                Traditional single-column layout
-                                                preferred by corporate
-                                                recruiters
-                                            </p>
-                                        </div>
+                                        <p className="text-xs text-slate-300">
+                                            {edu.degree} in {edu.fieldOfStudy}
+                                        </p>
                                     </div>
-                                    <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
-                                        Default
-                                    </span>
+                                ))}
+                            </section>
 
-                                    {/* DYNAMIC HOVER TOOLTIP PREVIEW LAYER */}
-                                    {showPreview && (
-                                        <div className="absolute right-0 bottom-full z-50 mb-3 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl transition-all duration-300">
-                                            <div className="mb-2 flex items-center justify-between border-b pb-1.5">
-                                                <span className="text-[10px] font-bold tracking-wide text-slate-500 uppercase">
-                                                    Layout Blueprint Preview
-                                                </span>
-                                                <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600">
-                                                    A4 Page Map
-                                                </span>
+                            {/* Skills Section */}
+                            <section className="mb-8 border-t border-emerald-500/20 pt-4">
+                                <h3 className="mb-3 font-mono text-xs font-bold tracking-wider text-emerald-400 uppercase">
+                                    Matched Skills & Technical Keywords
+                                </h3>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {optimizedData.skills.map((skill, i) => (
+                                        <span
+                                            key={i}
+                                            className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-mono text-xs text-emerald-300"
+                                        >
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* EXPORT PANEL SECTION */}
+                            <section className="mt-8 border-t border-slate-800 pt-6">
+                                <h3 className="mb-3 font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                                    Export & PDF Blueprint Selection
+                                </h3>
+
+                                <div className="flex flex-col gap-4">
+                                    {/* Template Selection Card Wrapper */}
+                                    <div
+                                        onMouseEnter={() => setShowPreview(true)}
+                                        onMouseLeave={() => setShowPreview(false)}
+                                        className="relative flex cursor-help items-center justify-between rounded-xl border border-slate-800 bg-slate-900/80 p-4 transition-all duration-200 hover:border-emerald-500/50 hover:bg-slate-900"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-slate-950 font-bold text-xs">
+                                                ✓
                                             </div>
-
-                                            {/* Highly Performant Structural Mockup Map */}
-                                            <div className="flex aspect-[1/1.414] w-full flex-col gap-2 overflow-hidden rounded border border-slate-300 bg-white p-3 shadow-inner select-none">
-                                                {/* Mock PII Header Area */}
-                                                <div className="h-2 w-3/4 rounded-sm bg-blue-900"></div>
-                                                <div className="flex gap-1.5">
-                                                    <div className="h-1 w-1/5 rounded-sm bg-slate-300"></div>
-                                                    <div className="h-1 w-1/5 rounded-sm bg-slate-300"></div>
-                                                    <div className="h-1 w-1/5 rounded-sm bg-slate-300"></div>
-                                                </div>
-                                                <div className="my-0.5 h-[0.5px] bg-slate-200" />
-
-                                                {/* Mock Summary block */}
-                                                <div className="h-1.5 w-1/4 rounded-sm bg-blue-700"></div>
-                                                <div className="space-y-1">
-                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
-                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
-                                                    <div className="h-1 w-5/6 rounded-sm bg-slate-100"></div>
-                                                </div>
-
-                                                {/* Mock Experience block */}
-                                                <div className="mt-1 h-1.5 w-1/3 rounded-sm bg-blue-700"></div>
-                                                <div className="flex items-center justify-between">
-                                                    <div className="h-1.5 w-1/2 rounded-sm bg-slate-400"></div>
-                                                    <div className="h-1 w-1/6 rounded-sm bg-slate-300"></div>
-                                                </div>
-                                                <div className="space-y-1 pl-1">
-                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
-                                                    <div className="h-1 w-11/12 rounded-sm bg-slate-100"></div>
-                                                    <div className="h-1 w-full rounded-sm bg-slate-100"></div>
-                                                </div>
-
-                                                {/* Mock Education block */}
-                                                <div className="mt-1 h-1.5 w-1/4 rounded-sm bg-blue-700"></div>
-                                                <div className="flex items-center justify-between">
-                                                    <div className="h-1.5 w-2/5 rounded-sm bg-slate-400"></div>
-                                                    <div className="h-1 w-1/6 rounded-sm bg-slate-300"></div>
-                                                </div>
-                                                <div className="h-1 w-1/3 rounded-sm bg-slate-200"></div>
-
-                                                {/* Mock Skills grid block */}
-                                                <div className="mt-1 h-1.5 w-1/4 rounded-sm bg-blue-700"></div>
-                                                <div className="grid grid-cols-3 gap-1">
-                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
-                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
-                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
-                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
-                                                    <div className="h-2 rounded-sm border border-slate-200 bg-slate-100"></div>
-                                                </div>
+                                            <div>
+                                                <p className="text-sm font-semibold text-white">
+                                                    Classic Executive PDF Template
+                                                </p>
+                                                <p className="text-xs text-slate-400">
+                                                    Clean single-column layout preferred by corporate ATS systems
+                                                </p>
                                             </div>
                                         </div>
-                                    )}
-                                </div>
+                                        <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] text-emerald-400">
+                                            Default
+                                        </span>
 
-                                {/* Dynamic Download Link Block */}
-                                <PDFDownloadLink
-                                    document={
-                                        <ClassicTemplate data={optimizedData} />
-                                    }
-                                    fileName={`${optimizedData.personalInfo.fullName.replace(/\s+/g, "_")}_Optimized_Resume.pdf`}
-                                    className="w-full text-center"
-                                >
-                                    {({ loading }) => (
-                                        <button
-                                            disabled={loading}
-                                            className="font-montserrat w-full cursor-pointer rounded bg-[#003ae7] py-3 font-medium text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:bg-gray-400"
-                                        >
-                                            {loading
-                                                ? "Assembling PDF Layers..."
-                                                : "Download Optimized PDF"}
-                                        </button>
-                                    )}
-                                </PDFDownloadLink>
-                            </div>
-                        </section>
-                    </>
-                ) : (
-                    <div className="mt-20 text-center text-gray-500">
-                        Failed to generate optimization strategy.
-                    </div>
-                )}
+                                        {/* DYNAMIC HOVER TOOLTIP PREVIEW LAYER */}
+                                        {showPreview && (
+                                            <div className="absolute right-0 bottom-full z-50 mb-3 w-64 rounded-2xl border border-slate-700 bg-[#0b0f17] p-4 shadow-2xl transition-all duration-300">
+                                                <div className="mb-2 flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                                    <span className="font-mono text-[10px] font-bold tracking-wide text-slate-400 uppercase">
+                                                        Blueprint Page Map
+                                                    </span>
+                                                    <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-emerald-400">
+                                                        A4 Format
+                                                    </span>
+                                                </div>
+
+                                                {/* Structural Mockup Map */}
+                                                <div className="flex aspect-[1/1.414] w-full flex-col gap-2 overflow-hidden rounded-lg border border-slate-800 bg-slate-950 p-3 select-none">
+                                                    <div className="h-2 w-3/4 rounded bg-emerald-500/80"></div>
+                                                    <div className="flex gap-1.5">
+                                                        <div className="h-1 w-1/5 rounded bg-slate-700"></div>
+                                                        <div className="h-1 w-1/5 rounded bg-slate-700"></div>
+                                                        <div className="h-1 w-1/5 rounded bg-slate-700"></div>
+                                                    </div>
+                                                    <div className="my-0.5 h-[0.5px] bg-slate-800" />
+
+                                                    <div className="h-1.5 w-1/4 rounded bg-emerald-500/60"></div>
+                                                    <div className="space-y-1">
+                                                        <div className="h-1 w-full rounded bg-slate-800"></div>
+                                                        <div className="h-1 w-full rounded bg-slate-800"></div>
+                                                        <div className="h-1 w-5/6 rounded bg-slate-800"></div>
+                                                    </div>
+
+                                                    <div className="mt-1 h-1.5 w-1/3 rounded bg-emerald-500/60"></div>
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="h-1.5 w-1/2 rounded bg-slate-700"></div>
+                                                        <div className="h-1 w-1/6 rounded bg-slate-800"></div>
+                                                    </div>
+                                                    <div className="space-y-1 pl-1">
+                                                        <div className="h-1 w-full rounded bg-slate-800"></div>
+                                                        <div className="h-1 w-11/12 rounded bg-slate-800"></div>
+                                                        <div className="h-1 w-full rounded bg-slate-800"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Download Link Component */}
+                                    <PDFDownloadLink
+                                        document={
+                                            <ClassicTemplate data={optimizedData} />
+                                        }
+                                        fileName={`${optimizedData.personalInfo.fullName.replace(/\s+/g, "_")}_Optimized_Resume.pdf`}
+                                        className="w-full text-center"
+                                    >
+                                        {({ loading }) => (
+                                            <button
+                                                disabled={loading}
+                                                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-3.5 font-heading font-semibold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.25)] transition-all hover:brightness-110 active:scale-[0.98] disabled:scale-100 disabled:bg-slate-800 disabled:text-slate-500"
+                                            >
+                                                <span>
+                                                    {loading
+                                                        ? "Assembling PDF Layers..."
+                                                        : "Download Optimized PDF"}
+                                                </span>
+                                                <svg
+                                                    className="h-4 w-4"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2.5"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </PDFDownloadLink>
+                                </div>
+                            </section>
+                        </>
+                    ) : (
+                        <div className="mt-20 text-center font-mono text-sm text-slate-500">
+                            Failed to generate optimization strategy.
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
 
 export default Evaluation;
+
